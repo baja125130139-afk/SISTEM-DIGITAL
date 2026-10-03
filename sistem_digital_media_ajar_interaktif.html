@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Digital • Media Ajar Interaktif ITERA</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            },
+            darkbg: '#0f172a',
+            darkcard: '#1e293b',
+            darkborder: '#334155'
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /* LED Indicator Glow */
+    .led-glow {
+      box-shadow: 0 0 15px #10b981, inset 0 0 5px #ffffff;
+    }
+    .led-glow-red {
+      box-shadow: 0 0 15px #ef4444, inset 0 0 5px #ffffff;
+    }
+    .led-glow-amber {
+      box-shadow: 0 0 15px #f59e0b, inset 0 0 5px #ffffff;
+    }
+    .led-glow-blue {
+      box-shadow: 0 0 15px #3b82f6, inset 0 0 5px #ffffff;
+    }
+
+    /* 7-Segment Display Styling */
+    .seven-segment {
+      display: inline-block;
+      width: 50px;
+      height: 80px;
+      position: relative;
+      background: #020617;
+      border-radius: 6px;
+      padding: 6px;
+      border: 1px solid #1e293b;
+    }
+    .seg {
+      position: absolute;
+      background: #1e293b;
+      border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+    .seg.active {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+    .seg-a { top: 6px; left: 12px; width: 26px; height: 6px; }
+    .seg-b { top: 12px; right: 6px; width: 6px; height: 26px; }
+    .seg-c { bottom: 12px; right: 6px; width: 6px; height: 26px; }
+    .seg-d { bottom: 6px; left: 12px; width: 26px; height: 6px; }
+    .seg-e { bottom: 12px; left: 6px; width: 6px; height: 26px; }
+    .seg-f { top: 12px; left: 6px; width: 6px; height: 26px; }
+    .seg-g { top: 37px; left: 12px; width: 26px; height: 6px; }
+
+    /* K-Map Grid Cell */
+    .kmap-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- Header Section -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 backdrop-blur bg-opacity-90">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+          <i class="fa-solid fa-microchip text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            Sistem Digital <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">3 SKS</span>
+          </h1>
+          <p class="text-xs text-slate-400">Institut Teknologi Sumatera (ITERA) • Media Ajar Interaktif</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          14 Modul Interaktif Active
+        </span>
+        <button onclick="resetCurrentSimulator()" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate text-blue-400"></i> Reset Simulator
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Weeks Navigation Bar (Horizontal Scroll / Grid) -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 shadow-xl">
+      <div class="flex items-center justify-between px-2 mb-2">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-blue-500"></i> Pilih Minggu / Modul Perkuliahan
+        </span>
+        <span class="text-xs text-slate-500" id="selectedModuleBadge">Minggu 1 dari 14</span>
+      </div>
+
+      <!-- Scrollable Week Buttons -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 px-1" id="weeksTabContainer">
+        <!-- Generated by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Main Module Display Area -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="moduleContainer">
+      <!-- Generated Dynamically by JS -->
+    </section>
+
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="bg-slate-950 border-t border-slate-800 mt-12 py-8 text-slate-400 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <h4 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-book-bookmark text-blue-400"></i> Referensi Buku Ajar Utama
+        </h4>
+        <ul class="space-y-1.5 text-xs text-slate-400 list-disc list-inside">
+          <li>Frank Vahid & Tony Givargis – <em>Embedded System Design: A Unified Hardware/Software Introduction</em> (Wiley)</li>
+          <li>Raj Kamal – <em>Embedded Systems: Architecture, Programming and Design</em> (McGraw-Hill)</li>
+          <li>Peter Barry & Patrick Crowley – <em>Modern Embedded Computing</em> (Morgan Kaufmann)</li>
+        </ul>
+      </div>
+
+      <div class="flex flex-col justify-between items-start md:items-end">
+        <div class="text-left md:text-right">
+          <p class="font-semibold text-white">Media Pembelajaran Interaktif Sistem Digital</p>
+          <p class="text-xs text-slate-500 mt-1">Dikembangkan untuk Perkuliahan & Praktikum Mandiri Mahasiswa ITERA</p>
+        </div>
+        <p class="text-xs text-slate-600 mt-4">© 2026 Institut Teknologi Sumatera (ITERA). Hak Cipta Dilindungi.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript Application Engine -->
+  <script>
+
+    // Global App State
+    let activeWeek = 1;
+
+    // Modules Master Data (Weeks 1-14)
+    const modulesData = {
+      1: {
+        title: "Pengantar Sistem Digital & Konversi Bilangan",
+        desc: "Sistem digital memproses data diskrit (0 dan 1). Memahami konversi antar sistem bilangan (Biner, Desimal, Hexadesimal, Oktal, BCD, dan Compliment-2) merupakan fondasi utama.",
+        outcomes: ["Membedakan sinyal analog dan digital", "Menguasai konversi Radix 2, 8, 10, 16", "Memahami representasi BCD & Signed Two's Complement"],
+        type: "converter"
+      },
+      2: {
+        title: "Gerbang Logika Dasar & Universal",
+        desc: "Gerbang logika adalah blok pembangun dasar sistem digital. Gerbang Universal (NAND & NOR) dapat membentuk fungsi logika apapun.",
+        outcomes: ["Memahami tabel kebenaran AND, OR, NOT, NAND, NOR, XOR, XNOR", "Analisis diagram simbol standar IEEE", "Implementasi gerbang universal"],
+        type: "logic_gates"
+      },
+      3: {
+        title: "Aljabar Boolean & Peta Karnaugh (K-Map)",
+        desc: "Peta Karnaugh adalah metode visual untuk menyederhanakan ekspresi Boolean hingga kondisi minimal (SOP & POS).",
+        outcomes: ["Penyederhanaan fungsi Boolean 2, 3, dan 4 variabel", "Pengelompokan minterm (Group 2, 4, 8, 16)", "Menghasilkan ekspresi SOP & POS paling sederhana"],
+        type: "kmap"
+      },
+      4: {
+        title: "Rangkaian Kombinasional Aritmatika",
+        desc: "Rangkaian aritmatika digital melakukan penjumlahan (Adder) dan pengurangan (Subtractor) bilangan biner.",
+        outcomes: ["Prinsip Half Adder vs Full Adder", "Prinsip Half Subtractor vs Full Subtractor", "Analisis propagasi Carry Out & Borrow"],
+        type: "adder_subtractor"
+      },
+      5: {
+        title: "Multiplexer, Demultiplexer & Decoder",
+        desc: "Multiplexer memilih salah satu saluran data masuk ke satu keluaran, sedangkan Decoder mengodekan kombinasi input ke jalur output yang sesuai.",
+        outcomes: ["Operasi Multiplexer 4:1 dengan jalur Selector S1-S0", "Decoder 3:8 mengemudikan Display 7-Segmen", "Pengaplikasian Rangkaian Kombinasional"],
+        type: "mux_decoder"
+      },
+      6: {
+        title: "Elemen Memori: Latch & Flip-Flop",
+        desc: "Rangkaian sekuensial memiliki elemen memori penyimpan 1-bit data yang dipicu oleh pulsa Clock (SR, JK, D, dan T Flip-Flop).",
+        outcomes: ["Perbedaan Latch vs Flip-Flop", "Karakteristik pemicuan Clock (Edge-Triggered)", "Analisis output Q dan ~Q"],
+        type: "flipflop"
+      },
+      7: {
+        title: "Register & Counter (Pencacah Biner)",
+        desc: "Counter adalah susunan Flip-Flop yang mencacah pulsa Clock secara asinkron atau sinkron dalam urutan Up/Down.",
+        outcomes: ["Pencacah Asinkron (Ripple Counter) 4-bit", "Operasi Up/Down Counting", "Interfacing output biner ke nilai desimal display 7-segmen"],
+        type: "counter"
+      },
+      8: {
+        title: "Evaluasi Tengah Semester (UTS)",
+        desc: "Uji pemahaman komprehensif untuk Modul 1 hingga Modul 7 melalui Kuis Interaktif Berpenilaian Otomatis.",
+        outcomes: ["Evaluasi konsep Konversi Bilangan & Logika", "Penyelesaian Soal Kombinasional & Sekuensial", "Umpan balik langsung beserta pembahasan"],
+        type: "quiz_uts"
+      },
+      9: {
+        title: "Finite State Machine (FSM)",
+        desc: "FSM adalah model matematika untuk merancang kontroler sekuensial terstruktur (Model Mealy & Moore).",
+        outcomes: ["Merancang State Diagram detektor urutan '101' / '110'", "Transisi State S0, S1, S2, S3 berdasarkan bit input stream", "Pengenalan output terdeteksi"],
+        type: "fsm"
+      },
+      10: {
+        title: "Memori Digital (RAM & ROM)",
+        desc: "Memori acak (RAM) menyimpan data sementara dengan jalur Address Bus, Data Bus, serta sinyal kontrol Read/Write.",
+        outcomes: ["Struktur Matriks Memori RAM 4x4", "Pengalamatan data (Address Decoding)", "Siklus Penulisan (Write) & Pembacaan (Read)"],
+        type: "ram_rom"
+      },
+      11: {
+        title: "Mikroarsitektur & System Bus",
+        desc: "Visualisasi pergerakan data pada Bus Sistem (Address, Data, Control Bus) dalam siklus instruksi Fetch-Decode-Execute.",
+        outcomes: ["Peran ALU, Program Counter (PC), dan Instruction Register (IR)", "Alur sinyal pada Address Bus, Data Bus, dan Control Bus", "Pemahaman siklus instruksi dasar"],
+        type: "microarch"
+      },
+      12: {
+        title: "Interfacing & Digital I/O (ADC & PWM)",
+        desc: "Antarmuka sistem digital ke dunia fisik menggunakan Analog-to-Digital Converter (ADC) dan penggerak Pulse Width Modulation (PWM).",
+        outcomes: ["Konversi tegangan analog (0-5V) ke digital 8-bit", "Kalkulasi resolusi kuantisasi Vref/256", "Pengaturan tingkat kecerahan LED menggunakan PWM"],
+        type: "adc_pwm"
+      },
+      13: {
+        title: "Hardware Description Language (HDL - Verilog)",
+        desc: "Pemodelan dan simulasi logika digital menggunakan bahasa deskripsi perangkat keras Verilog dengan Waveform Viewer.",
+        outcomes: ["Penulisan sintaks modul Verilog (Assign & Always)", "Simulasi logika AND, Full Adder, & Counter", "Membaca diagram gelombang pewaktuan (Waveform Simulator)"],
+        type: "hdl"
+      },
+      14: {
+        title: "Proyek Akhir Integrasi & Evaluasi UAS",
+        desc: "Implementasi Sistem Digital Terintegrasi (Lampu Lalu Lintas Digital / Jam Digital) dan Evaluasi Akhir Perkuliahan (UAS).",
+        outcomes: ["Integrasi Timer, FSM, & Display dalam sistem nyata", "Uji coba simulasi lalu lintas 3 fasa", "Evaluasi Kuis Akhir UAS 100%"],
+        type: "proyek_uas"
+      }
+    };
+
+    const state = {
+      // Week 1 State
+      converterVal: "1010",
+
+      // Week 2 State
+      selectedGate: "AND",
+      gateA: 0,
+      gateB: 0,
+
+      // Week 3 State
+      kmapMode: "2x2", // '2x2' or '4x4'
+      kmapData2: [0, 0, 0, 0], // m0..m3
+      kmapData4: Array(16).fill(0), // m0..m15
+
+      // Week 4 State
+      arithType: "full_adder",
+      arithA: 1,
+      arithB: 0,
+      arithCin: 1,
+
+      // Week 5 State
+      muxInputs: [1, 0, 1, 1],
+      muxSel: [0, 0],
+      decoderInput: 3, // 0..7
+
+      // Week 6 State
+      ffType: "JK",
+      ffInput1: 1, // S / J / D / T
+      ffInput2: 0, // R / K
+      ffQ: 0,
+      ffHistory: [],
+
+      // Week 7 State
+      counterVal: 0,
+      counterDir: "UP",
+      counterAuto: false,
+      counterTimer: null,
+
+      // Week 8 State (UTS Quiz)
+      utsAnswers: {},
+      utsSubmitted: false,
+
+      // Week 9 State (FSM)
+      fsmSeq: "101",
+      fsmCurrentState: "S0",
+      fsmStream: "10101101",
+      fsmIndex: 0,
+      fsmDetectedCount: 0,
+
+      // Week 10 State (RAM)
+      ramAddress: 0, // 0..3
+      ramInputData: [1, 0, 1, 0],
+      ramCells: [
+        [1, 0, 0, 1],
+        [0, 1, 1, 0],
+        [1, 1, 0, 0],
+        [0, 0, 1, 1]
+      ],
+      ramMode: "READ", // 'READ' or 'WRITE'
+
+      // Week 11 State (Microarchitecture)
+      cpuPhase: 0, // 0: Fetch, 1: Decode, 2: Execute, 3: Store
+      cpuAuto: false,
+      cpuTimer: null,
+
+      // Week 12 State (ADC/PWM)
+      adcVoltage: 2.50,
+      pwmDuty: 50,
+
+      // Week 13 State (HDL Verilog)
+      hdlTemplate: "and_gate",
+      hdlCode: `module and_gate (\n  input wire a,\n  input wire b,\n  output wire y\n);\n  assign y = a & b;\nendmodule`,
+      hdlSimulated: false,
+
+      // Week 14 State (Project & UAS)
+      activeProjectTab: "traffic",
+      trafficState: 0, // 0: Red, 1: Yellow, 2: Green
+      trafficTimer: 5,
+      trafficAuto: false,
+      uasAnswers: {},
+      uasSubmitted: false
+    };
+
+    function renderTabs() {
+      const container = document.getElementById('weeksTabContainer');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= 14; i++) {
+        const isActive = (i === activeWeek);
+        const btn = document.createElement('button');
+        btn.className = `flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${
+          isActive 
+            ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/30 ring-2 ring-blue-400/20' 
+            : 'bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white'
+        }`;
+        btn.innerHTML = `<span class="w-5 h-5 rounded-md ${isActive ? 'bg-white/20' : 'bg-slate-900'} flex items-center justify-center text-[10px]">${i}</span> Mg ${i}`;
+        btn.onclick = () => switchWeek(i);
+        container.appendChild(btn);
+      }
+
+      document.getElementById('selectedModuleBadge').innerText = `Minggu ${activeWeek} dari 14`;
+    }
+
+    function switchWeek(weekNum) {
+      activeWeek = weekNum;
+      renderTabs();
+      renderModuleContent();
+    }
+
+    function resetCurrentSimulator() {
+      // Reset logic per active module
+      if (activeWeek === 1) state.converterVal = "1010";
+      if (activeWeek === 2) { state.gateA = 0; state.gateB = 0; }
+      if (activeWeek === 3) { state.kmapData2.fill(0); state.kmapData4.fill(0); }
+      if (activeWeek === 6) { state.ffQ = 0; state.ffHistory = []; }
+      if (activeWeek === 7) { 
+        state.counterVal = 0; 
+        if (state.counterTimer) clearInterval(state.counterTimer);
+        state.counterAuto = false;
+      }
+      if (activeWeek === 8) { state.utsAnswers = {}; state.utsSubmitted = false; }
+      if (activeWeek === 9) { state.fsmCurrentState = "S0"; state.fsmIndex = 0; state.fsmDetectedCount = 0; }
+      if (activeWeek === 11) { 
+        state.cpuPhase = 0; 
+        if (state.cpuTimer) clearInterval(state.cpuTimer);
+        state.cpuAuto = false;
+      }
+      if (activeWeek === 14) { state.uasAnswers = {}; state.uasSubmitted = false; }
+
+      renderModuleContent();
+    }
+
+    function renderModuleContent() {
+      const data = modulesData[activeWeek];
+      const container = document.getElementById('moduleContainer');
+
+      // Left Column: Module Description & Theory
+      const theoryHTML = `
+        <div class="lg:col-span-4 space-y-5">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">
+              <i class="fa-solid fa-graduation-cap"></i> Modul Perkuliahan Mg ${activeWeek}
+            </div>
+            <h2 class="text-xl font-extrabold text-white mb-3 leading-snug">${data.title}</h2>
+            <p class="text-sm text-slate-300 leading-relaxed mb-4">${data.desc}</p>
+            
+            <div class="border-t border-slate-800 pt-3">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Capaian Pembelajaran:</span>
+              <ul class="space-y-2">
+                ${data.outcomes.map(o => `
+                  <li class="text-xs text-slate-300 flex items-start gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-sm mt-0.5"></i>
+                    <span>${o}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Right Column: Interactive Simulator Component
+      let simHTML = '';
+      switch (data.type) {
+        case 'converter': simHTML = getConverterSimHTML(); break;
+        case 'logic_gates': simHTML = getLogicGatesSimHTML(); break;
+        case 'kmap': simHTML = getKMapSimHTML(); break;
+        case 'adder_subtractor': simHTML = getAdderSubtractorSimHTML(); break;
+        case 'mux_decoder': simHTML = getMuxDecoderSimHTML(); break;
+        case 'flipflop': simHTML = getFlipFlopSimHTML(); break;
+        case 'counter': simHTML = getCounterSimHTML(); break;
+        case 'quiz_uts': simHTML = getUTSQuizSimHTML(); break;
+        case 'fsm': simHTML = getFSMSimHTML(); break;
+        case 'ram_rom': simHTML = getRAMSimHTML(); break;
+        case 'microarch': simHTML = getMicroarchSimHTML(); break;
+        case 'adc_pwm': simHTML = getADCPWMSimHTML(); break;
+        case 'hdl': simHTML = getHDLSimHTML(); break;
+        case 'proyek_uas': simHTML = getProyekUASSimHTML(); break;
+        default: simHTML = `<div class="p-4">Simulator dalam pengembangan</div>`;
+      }
+
+      const simContainerHTML = `
+        <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-5">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-flask text-amber-400"></i> Simulator Interaktif: ${data.title}
+            </h3>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono border border-slate-700">HTML5 Digital Engine</span>
+          </div>
+          ${simHTML}
+        </div>
+      `;
+
+      container.innerHTML = theoryHTML + simContainerHTML;
+      attachSimulatorEventListeners();
+    }
+
+    function getConverterSimHTML() {
+      const val = state.converterVal || "0";
+      const dec = parseInt(val, 2) || 0;
+      const hex = dec.toString(16).toUpperCase();
+      const oct = dec.toString(8);
+      
+      // BCD representation
+      const decStr = dec.toString();
+      const bcd = decStr.split('').map(d => parseInt(d).toString(2).padStart(4, '0')).join(' ');
+
+      // 8-bit Two's complement
+      let twosComp = "N/A";
+      if (dec >= -128 && dec <= 127) {
+        twosComp = (dec >= 0) 
+          ? dec.toString(2).padStart(8, '0') 
+          : ((1 << 8) + dec).toString(2);
+      }
+
+      return `
+        <div class="space-y-5">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-2">Input Bilangan Biner (0 & 1):</label>
+            <div class="relative">
+              <input type="text" id="binInput" value="${val}" oninput="updateConverter(this.value)"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg font-mono text-emerald-400 focus:outline-none focus:border-blue-500 tracking-widest">
+              <span class="absolute right-3 top-3 text-xs font-mono bg-slate-800 px-2 py-1 rounded text-slate-400">Base-2</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Desimal (Base-10)</span>
+              <span class="text-xl font-mono font-bold text-blue-400">${dec}</span>
+            </div>
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Hexadesimal (Base-16)</span>
+              <span class="text-xl font-mono font-bold text-amber-400">0x${hex}</span>
+            </div>
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Oktal (Base-8)</span>
+              <span class="text-xl font-mono font-bold text-purple-400">${oct}</span>
+            </div>
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 sm:col-span-2">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">BCD (Binary Coded Decimal)</span>
+              <span class="text-sm font-mono font-bold text-emerald-400 tracking-wider">${bcd || '0000'}</span>
+            </div>
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Signed 2's Comp (8-bit)</span>
+              <span class="text-sm font-mono font-bold text-rose-400">${twosComp}</span>
+            </div>
+          </div>
+
+          <!-- Step by Step Calculation Breakdown -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+            <h4 class="text-xs font-bold text-slate-300 uppercase mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-blue-400"></i> Langkah Konversi Posisional ke Desimal:
+            </h4>
+            <div class="font-mono text-xs text-slate-300 space-y-1 overflow-x-auto">
+              <p class="text-slate-400">// Posisional: ${val.split('').map((b, i) => `${b}×2<sup>${val.length - 1 - i}</sup>`).join(' + ')}</p>
+              <p class="text-emerald-400">// Hasil Akhir Desimal = <strong class="text-white">${dec}</strong></p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateConverter(val) {
+      val = val.replace(/[^01]/g, '');
+      state.converterVal = val;
+      renderModuleContent();
+    }
+
+    function getLogicGatesSimHTML() {
+      const gates = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
+      const g = state.selectedGate;
+      const a = state.gateA;
+      const b = state.gateB;
+
+      let output = 0;
+      switch (g) {
+        case 'AND': output = a && b ? 1 : 0; break;
+        case 'OR': output = a || b ? 1 : 0; break;
+        case 'NOT': output = !a ? 1 : 0; break;
+        case 'NAND': output = !(a && b) ? 1 : 0; break;
+        case 'NOR': output = !(a || b) ? 1 : 0; break;
+        case 'XOR': output = (a ^ b) ? 1 : 0; break;
+        case 'XNOR': output = !(a ^ b) ? 1 : 0; break;
+      }
+
+      return `
+        <div class="space-y-6">
+          <!-- Gate Selector Buttons -->
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Pilih Jenis Gerbang Logika:</label>
+            <div class="flex flex-wrap gap-2">
+              ${gates.map(gate => `
+                <button onclick="selectGate('${gate}')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition border ${
+                  g === gate ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/30' : 'bg-slate-950 text-slate-400 border-slate-800 hover:bg-slate-800'
+                }">
+                  ${gate}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Interactive Logic Diagram & Toggles -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-around gap-6">
+            <!-- Inputs -->
+            <div class="flex flex-col gap-4">
+              <button onclick="toggleGateInput('A')" class="px-4 py-2.5 rounded-xl text-xs font-bold border transition flex items-center gap-3 ${
+                a ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-slate-900 text-slate-400 border-slate-800'
+              }">
+                <span>Input A</span>
+                <span class="w-7 h-7 rounded-lg bg-slate-950 font-mono text-sm flex items-center justify-center font-bold ${a ? 'text-emerald-400' : 'text-slate-500'}">${a}</span>
+              </button>
+
+              ${g !== 'NOT' ? `
+                <button onclick="toggleGateInput('B')" class="px-4 py-2.5 rounded-xl text-xs font-bold border transition flex items-center gap-3 ${
+                  b ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-slate-900 text-slate-400 border-slate-800'
+                }">
+                  <span>Input B</span>
+                  <span class="w-7 h-7 rounded-lg bg-slate-950 font-mono text-sm flex items-center justify-center font-bold ${b ? 'text-emerald-400' : 'text-slate-500'}">${b}</span>
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- Gate Visual Badge -->
+            <div class="w-32 h-20 rounded-xl bg-blue-950/40 border-2 border-blue-500/40 flex items-center justify-center text-white font-extrabold text-2xl tracking-widest shadow-inner">
+              ${g}
+            </div>
+
+            <!-- Output Indicator -->
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-xs font-bold text-slate-400 uppercase">LED Output Y</span>
+              <div class="w-12 h-12 rounded-full border-2 border-slate-700 flex items-center justify-center transition-all duration-300 ${
+                output ? 'bg-emerald-500 border-emerald-400 led-glow' : 'bg-slate-900 border-slate-800'
+              }">
+                <span class="font-mono font-extrabold text-lg ${output ? 'text-white' : 'text-slate-600'}">${output}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Truth Table -->
+          <div>
+            <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Tabel Kebenaran Gerbang ${g}:</h4>
+            <div class="overflow-hidden rounded-xl border border-slate-800">
+              <table class="w-full text-xs text-center">
+                <thead class="bg-slate-950 text-slate-400 font-bold uppercase border-b border-slate-800">
+                  <tr>
+                    <th class="py-2 px-3">Input A</th>
+                    ${g !== 'NOT' ? '<th class="py-2 px-3">Input B</th>' : ''}
+                    <th class="py-2 px-3">Output (Y)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 font-mono">
+                  ${getTruthTableRows(g, a, b)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectGate(gate) {
+      state.selectedGate = gate;
+      renderModuleContent();
+    }
+
+    function toggleGateInput(inp) {
+      if (inp === 'A') state.gateA = state.gateA ? 0 : 1;
+      if (inp === 'B') state.gateB = state.gateB ? 0 : 1;
+      renderModuleContent();
+    }
+
+    function getTruthTableRows(g, currentA, currentB) {
+      const combos = (g === 'NOT') ? [[0], [1]] : [[0,0], [0,1], [1,0], [1,1]];
+      return combos.map(c => {
+        const ca = c[0];
+        const cb = c[1] || 0;
+        let out = 0;
+        switch (g) {
+          case 'AND': out = ca && cb ? 1 : 0; break;
+          case 'OR': out = ca || cb ? 1 : 0; break;
+          case 'NOT': out = !ca ? 1 : 0; break;
+          case 'NAND': out = !(ca && cb) ? 1 : 0; break;
+          case 'NOR': out = !(ca || cb) ? 1 : 0; break;
+          case 'XOR': out = (ca ^ cb) ? 1 : 0; break;
+          case 'XNOR': out = !(ca ^ cb) ? 1 : 0; break;
+        }
+
+        const isActive = (g === 'NOT') ? (ca === currentA) : (ca === currentA && cb === currentB);
+        return `
+          <tr class="${isActive ? 'bg-blue-600/20 text-blue-400 font-bold' : 'bg-slate-900 text-slate-300'}">
+            <td class="py-2">${ca}</td>
+            ${g !== 'NOT' ? `<td class="py-2">${cb}</td>` : ''}
+            <td class="py-2 ${out ? 'text-emerald-400 font-bold' : 'text-slate-500'}">${out}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getKMapSimHTML() {
+      const is2x2 = (state.kmapMode === '2x2');
+      const data = is2x2 ? state.kmapData2 : state.kmapData4;
+
+      // Calculate simplified SOP expression
+      const sopExpression = solveKMapSOP(is2x2, data);
+
+      return `
+        <div class="space-y-5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-400 uppercase">Pilih Ukuran K-Map:</label>
+            <div class="flex gap-2">
+              <button onclick="setKMapMode('2x2')" class="px-3 py-1 rounded-lg text-xs font-bold border ${is2x2 ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-950 text-slate-400 border-slate-800'}">
+                2 Variabel (A, B)
+              </button>
+              <button onclick="setKMapMode('4x4')" class="px-3 py-1 rounded-lg text-xs font-bold border ${!is2x2 ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-950 text-slate-400 border-slate-800'}">
+                4 Variabel (A, B, C, D)
+              </button>
+            </div>
+          </div>
+
+          <!-- K-Map Grid Area -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 flex flex-col items-center">
+            <p class="text-xs text-slate-400 mb-3 text-center">Klik sel untuk mengubah nilai Minterm (0 ↔ 1):</p>
+            
+            ${is2x2 ? render2x2KMapGrid(data) : render4x4KMapGrid(data)}
+          </div>
+
+          <!-- Result Expression Display -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-bold uppercase block mb-1">Hasil Penyederhanaan (SOP - Sum of Products):</span>
+            <div class="text-lg font-mono font-extrabold text-emerald-400 tracking-wider">
+              F = ${sopExpression}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setKMapMode(mode) {
+      state.kmapMode = mode;
+      renderModuleContent();
+    }
+
+    function toggleKMapCell(idx) {
+      if (state.kmapMode === '2x2') {
+        state.kmapData2[idx] = state.kmapData2[idx] ? 0 : 1;
+      } else {
+        state.kmapData4[idx] = state.kmapData4[idx] ? 0 : 1;
+      }
+      renderModuleContent();
+    }
+
+    function render2x2KMapGrid(data) {
+      // Row A (0, 1), Col B (0, 1)
+      return `
+        <div class="inline-block">
+          <div class="grid grid-cols-3 gap-1 text-center font-mono text-xs font-bold text-slate-400 mb-1">
+            <div>A\\B</div>
+            <div>B=0</div>
+            <div>B=1</div>
+          </div>
+          <div class="grid grid-cols-3 gap-1">
+            <div class="flex items-center justify-center font-mono text-xs text-slate-400 font-bold">A=0</div>
+            <button onclick="toggleKMapCell(0)" class="kmap-cell rounded-lg border ${data[0] ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-600 border-slate-800'}">${data[0]}</button>
+            <button onclick="toggleKMapCell(1)" class="kmap-cell rounded-lg border ${data[1] ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-600 border-slate-800'}">${data[1]}</button>
+            
+            <div class="flex items-center justify-center font-mono text-xs text-slate-400 font-bold">A=1</div>
+            <button onclick="toggleKMapCell(2)" class="kmap-cell rounded-lg border ${data[2] ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-600 border-slate-800'}">${data[2]}</button>
+            <button onclick="toggleKMapCell(3)" class="kmap-cell rounded-lg border ${data[3] ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-600 border-slate-800'}">${data[3]}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function render4x4KMapGrid(data) {
+      // Gray Code order for cols (CD): 00, 01, 11, 10
+      // Gray Code order for rows (AB): 00, 01, 11, 10
+      const rowLabels = ["00", "01", "11", "10"];
+      const colLabels = ["00", "01", "11", "10"];
+      // Cell mapping matrix index to minterm index:
+      // Row 00 (AB=00): m0, m1, m3, m2
+      // Row 01 (AB=01): m4, m5, m7, m6
+      // Row 11 (AB=11): m12, m13, m15, m14
+      // Row 10 (AB=10): m8, m9, m11, m10
+      const mapMatrix = [
+        [0, 1, 3, 2],
+        [4, 5, 7, 6],
+        [12, 13, 15, 14],
+        [8, 9, 11, 10]
+      ];
+
+      return `
+        <div class="overflow-x-auto w-full max-w-md">
+          <div class="grid grid-cols-5 gap-1 text-center font-mono text-xs font-bold text-slate-400 mb-1">
+            <div>AB\\CD</div>
+            ${colLabels.map(c => `<div>${c}</div>`).join('')}
+          </div>
+          ${rowLabels.map((rLabel, rIdx) => `
+            <div class="grid grid-cols-5 gap-1 mb-1">
+              <div class="flex items-center justify-center font-mono text-xs text-slate-400 font-bold">${rLabel}</div>
+              ${mapMatrix[rIdx].map(mIdx => `
+                <button onclick="toggleKMapCell(${mIdx})" class="kmap-cell rounded-lg border ${data[mIdx] ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-600 border-slate-800'}">${data[mIdx]}</button>
+              `).join('')}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function solveKMapSOP(is2x2, data) {
+      if (is2x2) {
+        const ones = data.map((v, i) => v === 1 ? i : -1).filter(i => i !== -1);
+        if (ones.length === 0) return "0";
+        if (ones.length === 4) return "1";
+        
+        let terms = [];
+        if (data[0] && data[1]) terms.push("A'");
+        if (data[2] && data[3]) terms.push("A");
+        if (data[0] && data[2]) terms.push("B'");
+        if (data[1] && data[3]) terms.push("B");
+
+        if (terms.length > 0) return terms.join(" + ");
+
+        // Single minterms
+        const singleTerms = [];
+        if (data[0]) singleTerms.push("A'B'");
+        if (data[1]) singleTerms.push("A'B");
+        if (data[2]) singleTerms.push("AB'");
+        if (data[3]) singleTerms.push("AB");
+        return singleTerms.join(" + ");
+      } else {
+        const ones = data.map((v, i) => v === 1 ? i : -1).filter(i => i !== -1);
+        if (ones.length === 0) return "0";
+        if (ones.length === 16) return "1";
+        
+        // Simplified minterm list representation
+        return `Σm(${ones.join(', ')})`;
+      }
+    }
+
+    function getAdderSubtractorSimHTML() {
+      const type = state.arithType;
+      const a = state.arithA;
+      const b = state.arithB;
+      const cin = state.arithCin;
+
+      let sumDiff = 0;
+      let carryBorrow = 0;
+
+      if (type === 'half_adder') {
+        sumDiff = a ^ b;
+        carryBorrow = a & b;
+      } else if (type === 'full_adder') {
+        sumDiff = a ^ b ^ cin;
+        carryBorrow = (a & b) | (cin & (a ^ b));
+      } else if (type === 'half_subtractor') {
+        sumDiff = a ^ b;
+        carryBorrow = (!a) & b;
+      } else if (type === 'full_subtractor') {
+        sumDiff = a ^ b ^ cin;
+        carryBorrow = ((!a) & b) | ((!(a ^ b)) & cin);
+      }
+
+      return `
+        <div class="space-y-6">
+          <!-- Type Switcher -->
+          <div class="flex flex-wrap gap-2">
+            ${[
+              ['full_adder', 'Full Adder'],
+              ['half_adder', 'Half Adder'],
+              ['full_subtractor', 'Full Subtractor'],
+              ['half_subtractor', 'Half Subtractor']
+            ].map(([tKey, tLabel]) => `
+              <button onclick="setArithType('${tKey}')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
+                type === tKey ? 'bg-blue-600 text-white border-blue-500 shadow-md' : 'bg-slate-950 text-slate-400 border-slate-800 hover:bg-slate-800'
+              }">
+                ${tLabel}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Interactive Inputs & Logic Box -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            <!-- Inputs Column -->
+            <div class="space-y-3">
+              <span class="text-xs font-bold text-slate-400 uppercase block">Bit Input:</span>
+              <button onclick="toggleArithInp('A')" class="w-full px-4 py-2 rounded-xl text-xs font-bold border flex items-center justify-between ${a ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                <span>Input Bit A</span> <span class="font-mono text-base font-bold">${a}</span>
+              </button>
+              <button onclick="toggleArithInp('B')" class="w-full px-4 py-2 rounded-xl text-xs font-bold border flex items-center justify-between ${b ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                <span>Input Bit B</span> <span class="font-mono text-base font-bold">${b}</span>
+              </button>
+              ${type.startsWith('full') ? `
+                <button onclick="toggleArithInp('Cin')" class="w-full px-4 py-2 rounded-xl text-xs font-bold border flex items-center justify-between ${cin ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                  <span>${type.includes('adder') ? 'Carry In (Cin)' : 'Borrow In (Bin)'}</span> <span class="font-mono text-base font-bold">${cin}</span>
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- Schematic Box Center -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center min-h-[140px]">
+              <i class="fa-solid fa-calculator text-blue-400 text-2xl mb-2"></i>
+              <span class="font-bold text-white text-sm uppercase tracking-wider">${type.replace('_', ' ')}</span>
+              <span class="text-[10px] text-slate-400 mt-1">Aritmatika Digital Biner</span>
+            </div>
+
+            <!-- Output LEDs Column -->
+            <div class="space-y-4 flex flex-col items-center">
+              <div class="flex items-center justify-between w-full bg-slate-900 p-3 rounded-xl border border-slate-800">
+                <span class="text-xs font-bold text-slate-300 uppercase">${type.includes('adder') ? 'Hasil (Sum S)' : 'Hasil (Diff D)'}</span>
+                <span class="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm ${sumDiff ? 'bg-emerald-500 text-white led-glow' : 'bg-slate-950 text-slate-600'}">${sumDiff}</span>
+              </div>
+              <div class="flex items-center justify-between w-full bg-slate-900 p-3 rounded-xl border border-slate-800">
+                <span class="text-xs font-bold text-slate-300 uppercase">${type.includes('adder') ? 'Carry Out (Cout)' : 'Borrow Out (Bout)'}</span>
+                <span class="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm ${carryBorrow ? 'bg-amber-500 text-white led-glow-amber' : 'bg-slate-950 text-slate-600'}">${carryBorrow}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setArithType(type) {
+      state.arithType = type;
+      renderModuleContent();
+    }
+
+    function toggleArithInp(key) {
+      if (key === 'A') state.arithA = state.arithA ? 0 : 1;
+      if (key === 'B') state.arithB = state.arithB ? 0 : 1;
+      if (key === 'Cin') state.arithCin = state.arithCin ? 0 : 1;
+      renderModuleContent();
+    }
+
+    function getMuxDecoderSimHTML() {
+      const inputs = state.muxInputs;
+      const sel = state.muxSel;
+      const selIdx = (sel[1] << 1) | sel[0];
+      const muxOut = inputs[selIdx];
+
+      const decVal = state.decoderInput; // 0..7
+
+      return `
+        <div class="space-y-6">
+          <!-- Simulator Part 1: Multiplexer 4:1 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3">1. Simulator Multiplexer 4:1 (MUX)</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-bold block mb-1">Data Inputs (I0 - I3):</span>
+                <div class="grid grid-cols-2 gap-2">
+                  ${inputs.map((val, i) => `
+                    <button onclick="toggleMuxInp(${i})" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border flex items-center justify-between ${val ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-500 border-slate-800'}">
+                      <span>I${i}</span> <span class="font-mono">${val}</span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-bold block mb-1">Selector (S1, S0):</span>
+                <div class="flex gap-2">
+                  <button onclick="toggleMuxSel(1)" class="flex-1 py-1.5 rounded-lg text-xs font-bold border ${sel[1] ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                    S1 = ${sel[1]}
+                  </button>
+                  <button onclick="toggleMuxSel(0)" class="flex-1 py-1.5 rounded-lg text-xs font-bold border ${sel[0] ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-800'}">
+                    S0 = ${sel[0]}
+                  </button>
+                </div>
+              </div>
+
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-300">Terpilih: I${selIdx} → Output Y:</span>
+                <span class="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm ${muxOut ? 'bg-emerald-500 text-white led-glow' : 'bg-slate-950 text-slate-600'}">${muxOut}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulator Part 2: Decoder 3:8 to 7-Segment -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">2. Decoder 3-bit ke Display 7-Segmen</h4>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-around gap-6">
+              <div>
+                <label class="text-xs font-bold text-slate-400 block mb-2">Input Nilai Biner (0 - 7):</label>
+                <div class="flex gap-1.5">
+                  ${[0,1,2,3,4,5,6,7].map(num => `
+                    <button onclick="setDecoderInput(${num})" class="w-8 h-8 rounded-lg font-mono text-xs font-bold border ${decVal === num ? 'bg-amber-500 text-white border-amber-400 shadow-md shadow-amber-500/30' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                      ${num}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- 7-Segment LED Rendering -->
+              <div class="flex items-center gap-4">
+                <span class="text-xs font-bold text-slate-400">Display 7-Segmen:</span>
+                ${render7SegmentLED(decVal)}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleMuxInp(idx) {
+      state.muxInputs[idx] = state.muxInputs[idx] ? 0 : 1;
+      renderModuleContent();
+    }
+
+    function toggleMuxSel(sIdx) {
+      state.muxSel[sIdx] = state.muxSel[sIdx] ? 0 : 1;
+      renderModuleContent();
+    }
+
+    function setDecoderInput(num) {
+      state.decoderInput = num;
+      renderModuleContent();
+    }
+
+    function render7SegmentLED(num) {
+      // Segments map for digits 0-7: [a, b, c, d, e, f, g]
+      const segMap = {
+        0: [1, 1, 1, 1, 1, 1, 0],
+        1: [0, 1, 1, 0, 0, 0, 0],
+        2: [1, 1, 0, 1, 1, 0, 1],
+        3: [1, 1, 1, 1, 0, 0, 1],
+        4: [0, 1, 1, 0, 0, 1, 1],
+        5: [1, 0, 1, 1, 0, 1, 1],
+        6: [1, 0, 1, 1, 1, 1, 1],
+        7: [1, 1, 1, 0, 0, 0, 0]
+      };
+      const activeSegs = segMap[num] || [0,0,0,0,0,0,0];
+
+      return `
+        <div class="seven-segment">
+          <div class="seg seg-a ${activeSegs[0] ? 'active' : ''}"></div>
+          <div class="seg seg-b ${activeSegs[1] ? 'active' : ''}"></div>
+          <div class="seg seg-c ${activeSegs[2] ? 'active' : ''}"></div>
+          <div class="seg seg-d ${activeSegs[3] ? 'active' : ''}"></div>
+          <div class="seg seg-e ${activeSegs[4] ? 'active' : ''}"></div>
+          <div class="seg seg-f ${activeSegs[5] ? 'active' : ''}"></div>
+          <div class="seg seg-g ${activeSegs[6] ? 'active' : ''}"></div>
+        </div>
+      `;
+    }
+
+    function getFlipFlopSimHTML() {
+      const type = state.ffType;
+      const q = state.ffQ;
+      const qBar = q ? 0 : 1;
+
+      return `
+        <div class="space-y-6">
+          <div class="flex gap-2">
+            ${['JK', 'SR', 'D', 'T'].map(t => `
+              <button onclick="setFFType('${t}')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold border transition ${
+                type === t ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-950 text-slate-400 border-slate-800'
+              }">
+                ${t} Flip-Flop
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-around gap-6">
+            <!-- Inputs -->
+            <div class="space-y-3">
+              ${(type === 'JK' || type === 'SR') ? `
+                <button onclick="toggleFFInp(1)" class="w-36 px-3 py-2 rounded-xl text-xs font-bold border flex items-center justify-between ${state.ffInput1 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                  <span>Input ${type[0]}</span> <span class="font-mono">${state.ffInput1}</span>
+                </button>
+                <button onclick="toggleFFInp(2)" class="w-36 px-3 py-2 rounded-xl text-xs font-bold border flex items-center justify-between ${state.ffInput2 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                  <span>Input ${type[1]}</span> <span class="font-mono">${state.ffInput2}</span>
+                </button>
+              ` : `
+                <button onclick="toggleFFInp(1)" class="w-36 px-3 py-2 rounded-xl text-xs font-bold border flex items-center justify-between ${state.ffInput1 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                  <span>Input ${type}</span> <span class="font-mono">${state.ffInput1}</span>
+                </button>
+              `}
+            </div>
+
+            <!-- Clock Pulse Trigger Center -->
+            <div class="text-center">
+              <button onclick="triggerFFClock()" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-blue-500/30 flex items-center gap-2 active:scale-95 transition">
+                <i class="fa-solid fa-bolt text-amber-300"></i> Kirim Pulsa Clock (CLK)
+              </button>
+              <span class="text-[10px] text-slate-500 block mt-2">Trigger Transisi Keadaan (Edge-Triggered)</span>
+            </div>
+
+            <!-- Outputs Q & ~Q -->
+            <div class="flex gap-4">
+              <div class="text-center">
+                <span class="text-[10px] text-slate-400 font-bold block mb-1">Output Q</span>
+                <div class="w-12 h-12 rounded-xl border flex items-center justify-center font-mono text-xl font-bold ${q ? 'bg-emerald-500 text-white border-emerald-400 led-glow' : 'bg-slate-900 text-slate-600 border-slate-800'}">
+                  ${q}
+                </div>
+              </div>
+              <div class="text-center">
+                <span class="text-[10px] text-slate-400 font-bold block mb-1">Output ~Q</span>
+                <div class="w-12 h-12 rounded-xl border flex items-center justify-center font-mono text-xl font-bold ${qBar ? 'bg-rose-500 text-white border-rose-400 led-glow-red' : 'bg-slate-900 text-slate-600 border-slate-800'}">
+                  ${qBar}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setFFType(t) {
+      state.ffType = t;
+      renderModuleContent();
+    }
+
+    function toggleFFInp(num) {
+      if (num === 1) state.ffInput1 = state.ffInput1 ? 0 : 1;
+      if (num === 2) state.ffInput2 = state.ffInput2 ? 0 : 1;
+      renderModuleContent();
+    }
+
+    function triggerFFClock() {
+      const t = state.ffType;
+      const i1 = state.ffInput1;
+      const i2 = state.ffInput2;
+      let q = state.ffQ;
+
+      if (t === 'JK') {
+        if (i1 === 0 && i2 === 0) {} // No change
+        else if (i1 === 0 && i2 === 1) q = 0; // Reset
+        else if (i1 === 1 && i2 === 0) q = 1; // Set
+        else if (i1 === 1 && i2 === 1) q = q ? 0 : 1; // Toggle
+      } else if (t === 'SR') {
+        if (i1 === 1 && i2 === 1) {
+          // Invalid state warning
+        } else if (i1 === 1) q = 1; // Set
+        else if (i2 === 1) q = 0; // Reset
+      } else if (t === 'D') {
+        q = i1;
+      } else if (t === 'T') {
+        if (i1 === 1) q = q ? 0 : 1;
+      }
+
+      state.ffQ = q;
+      renderModuleContent();
+    }
+
+    function getCounterSimHTML() {
+      const val = state.counterVal; // 0..15
+      const bits = [
+        (val >> 3) & 1,
+        (val >> 2) & 1,
+        (val >> 1) & 1,
+        val & 1
+      ];
+
+      return `
+        <div class="space-y-6">
+          <!-- Control Actions -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex gap-2">
+              <button onclick="stepCounter()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow border border-blue-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-play"></i> Pulsa Clock Manual
+              </button>
+              <button onclick="toggleAutoCounter()" class="px-4 py-2 ${state.counterAuto ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300'} font-bold text-xs rounded-xl border border-slate-700">
+                ${state.counterAuto ? '⏸ Pause Auto Clock' : '▶ Auto Clock (1 Hz)'}
+              </button>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="setCounterDir('UP')" class="px-3 py-1.5 rounded-lg text-xs font-bold border ${state.counterDir === 'UP' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-950 text-slate-400 border-slate-800'}">
+                Up Counter
+              </button>
+              <button onclick="setCounterDir('DOWN')" class="px-3 py-1.5 rounded-lg text-xs font-bold border ${state.counterDir === 'DOWN' ? 'bg-rose-600 text-white border-rose-500' : 'bg-slate-950 text-slate-400 border-slate-800'}">
+                Down Counter
+              </button>
+            </div>
+          </div>
+
+          <!-- Counter Display Box -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-around gap-6">
+            <!-- 4-Bit Output LEDs -->
+            <div>
+              <span class="text-xs font-bold text-slate-400 uppercase block mb-2 text-center">Output Biner 4-Bit (Q3 Q2 Q1 Q0):</span>
+              <div class="flex gap-3">
+                ${bits.map((b, i) => `
+                  <div class="flex flex-col items-center gap-1">
+                    <span class="text-[10px] text-slate-500 font-mono">Q${3-i}</span>
+                    <div class="w-10 h-10 rounded-xl border flex items-center justify-center font-mono font-bold text-base ${b ? 'bg-emerald-500 text-white border-emerald-400 led-glow' : 'bg-slate-900 text-slate-600 border-slate-800'}">
+                      ${b}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Decimal & 7-Segment Output -->
+            <div class="flex items-center gap-6">
+              <div class="text-center">
+                <span class="text-xs font-bold text-slate-400 uppercase block mb-1">Nilai Desimal</span>
+                <span class="text-3xl font-mono font-extrabold text-blue-400">${val}</span>
+              </div>
+              <div>
+                ${render7SegmentLED(val % 8)}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function stepCounter() {
+      if (state.counterDir === 'UP') {
+        state.counterVal = (state.counterVal + 1) % 16;
+      } else {
+        state.counterVal = (state.counterVal - 1 + 16) % 16;
+      }
+      renderModuleContent();
+    }
+
+    function setCounterDir(dir) {
+      state.counterDir = dir;
+      renderModuleContent();
+    }
+
+    function toggleAutoCounter() {
+      state.counterAuto = !state.counterAuto;
+      if (state.counterAuto) {
+        state.counterTimer = setInterval(() => {
+          stepCounter();
+        }, 1000);
+      } else {
+        if (state.counterTimer) clearInterval(state.counterTimer);
+      }
+      renderModuleContent();
+    }
+
+    function getUTSQuizSimHTML() {
+      const questions = [
+        {
+          q: "1. Konversi bilangan biner (101101)₂ ke dalam sistem bilangan desimal adalah:",
+          opts: ["A. 43", "B. 45", "C. 47", "D. 53"],
+          ans: 1, // B
+          exp: "(101101)₂ = 32 + 0 + 8 + 4 + 0 + 1 = 45."
+        },
+        {
+          q: "2. Gerbang logika universal yang dapat digunakan untuk membentuk seluruh fungsi logika lainnya adalah:",
+          opts: ["A. AND dan OR", "B. NAND dan NOR", "C. XOR dan XNOR", "D. NOT dan AND"],
+          ans: 1, // B
+          exp: "NAND dan NOR disebut gerbang universal karena sifat kelengkapan logisnya."
+        },
+        {
+          q: "3. Hasil penyederhanaan fungsi Boolean F = A'B + AB adalah:",
+          opts: ["A. A", "B. B", "C. A + B", "D. A'"],
+          ans: 1, // B
+          exp: "F = B(A' + A) = B(1) = B."
+        },
+        {
+          q: "4. Perbedaan utama antara Full Adder dan Half Adder terletak pada ketersediaan:",
+          opts: ["A. Output Sum", "B. Input Carry In", "C. Input Bit A", "D. Output Carry Out"],
+          ans: 1, // B
+          exp: "Full Adder memiliki 3 input termasuk Carry In (Cin), sedangkan Half Adder hanya memproses 2 bit input."
+        },
+        {
+          q: "5. Jenis Flip-Flop yang memiliki kondisi larangan (Invalid State) saat kedua input bernilai 1 adalah:",
+          opts: ["A. D Flip-Flop", "B. JK Flip-Flop", "C. SR Flip-Flop", "D. T Flip-Flop"],
+          ans: 2, // C
+          exp: "SR Flip-Flop tidak membolehkan S=1 dan R=1 secara bersamaan karena menyebabkan perlombaan (race condition)."
+        }
+      ];
+
+      const submitted = state.utsSubmitted;
+
+      return `
+        <div class="space-y-6">
+          ${questions.map((item, qIdx) => {
+            const userAns = state.utsAnswers[qIdx];
+            return `
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                <p class="text-xs font-bold text-white">${item.q}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  ${item.opts.map((opt, oIdx) => {
+                    let optStyle = "bg-slate-900 text-slate-300 border-slate-800";
+                    if (userAns === oIdx) optStyle = "bg-blue-600 text-white border-blue-500 font-bold";
+
+                    if (submitted) {
+                      if (oIdx === item.ans) optStyle = "bg-emerald-600 text-white border-emerald-500 font-bold";
+                      else if (userAns === oIdx && userAns !== item.ans) optStyle = "bg-rose-600 text-white border-rose-500";
+                    }
+
+                    return `
+                      <button onclick="selectUTSAns(${qIdx}, ${oIdx})" ${submitted ? 'disabled' : ''} 
+                        class="p-2.5 rounded-lg text-xs text-left border transition ${optStyle}">
+                        ${opt}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+                ${submitted ? `
+                  <p class="text-[11px] text-amber-400 bg-slate-900/80 p-2 rounded border border-slate-800 font-mono">
+                    💡 <strong>Pembahasan:</strong> ${item.exp}
+                  </p>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+
+          <div class="flex items-center justify-between border-t border-slate-800 pt-4">
+            ${!submitted ? `
+              <button onclick="submitUTS()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30">
+                Kirim Jawaban UTS
+              </button>
+            ` : `
+              <div class="flex items-center gap-4">
+                <span class="text-sm font-bold text-white">Skor Akhir UTS: <strong class="text-emerald-400 font-mono text-lg">${calcUTSScore(questions)} / 100</strong></span>
+                <button onclick="resetUTS()" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl border border-slate-700">
+                  Ulangi Kuis
+                </button>
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectUTSAns(qIdx, oIdx) {
+      state.utsAnswers[qIdx] = oIdx;
+      renderModuleContent();
+    }
+
+    function submitUTS() {
+      state.utsSubmitted = true;
+      renderModuleContent();
+    }
+
+    function resetUTS() {
+      state.utsAnswers = {};
+      state.utsSubmitted = false;
+      renderModuleContent();
+    }
+
+    function calcUTSScore(questions) {
+      let correct = 0;
+      questions.forEach((q, idx) => {
+        if (state.utsAnswers[idx] === q.ans) correct++;
+      });
+      return (correct / questions.length) * 100;
+    }
+
+    function getFSMSimHTML() {
+      const currentState = state.fsmCurrentState;
+      const stream = state.fsmStream;
+      const index = state.fsmIndex;
+      const currentBit = stream[index] || '-';
+
+      return `
+        <div class="space-y-6">
+          <!-- Input Stream & Controls -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-400 block mb-1">Stream Input Biner:</label>
+              <input type="text" value="${stream}" onchange="updateFSMStream(this.value)" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-sm font-mono text-emerald-400 tracking-widest">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="stepFSM()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow">
+                Langkah Berikutnya (Next Bit)
+              </button>
+              <button onclick="resetFSM()" class="px-3 py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl border border-slate-700">
+                Reset FSM
+              </button>
+            </div>
+          </div>
+
+          <!-- State Diagram Visualization -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col items-center">
+            <h4 class="text-xs font-bold text-slate-400 uppercase mb-4">State Diagram Detektor Urutan '101':</h4>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+              ${['S0', 'S1', 'S2', 'S3'].map((s, idx) => `
+                <div class="w-20 h-20 rounded-full border-2 flex flex-col items-center justify-center font-bold font-mono transition-all ${
+                  currentState === s 
+                    ? 'bg-blue-600 text-white border-blue-400 led-glow scale-110' 
+                    : 'bg-slate-900 text-slate-500 border-slate-800'
+                }">
+                  <span>${s}</span>
+                  <span class="text-[9px] font-normal">${s === 'S3' ? 'Out=1' : 'Out=0'}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="mt-6 font-mono text-xs text-slate-300 space-y-1 text-center">
+              <p>Bit Saat Ini: <strong class="text-amber-400 text-base">${currentBit}</strong> (Posisi Stream: ${index}/${stream.length})</p>
+              <p>Total Terdeteksi Paket '101': <strong class="text-emerald-400 font-bold text-sm">${state.fsmDetectedCount}</strong></p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateFSMStream(val) {
+      state.fsmStream = val.replace(/[^01]/g, '');
+      state.fsmIndex = 0;
+      state.fsmCurrentState = 'S0';
+      state.fsmDetectedCount = 0;
+      renderModuleContent();
+    }
+
+    function stepFSM() {
+      const stream = state.fsmStream;
+      if (state.fsmIndex >= stream.length) return;
+
+      const bit = stream[state.fsmIndex];
+      let cs = state.fsmCurrentState;
+
+      // FSM logic for '101' sequence detector
+      if (cs === 'S0') {
+        cs = (bit === '1') ? 'S1' : 'S0';
+      } else if (cs === 'S1') {
+        cs = (bit === '0') ? 'S2' : 'S1';
+      } else if (cs === 'S2') {
+        if (bit === '1') {
+          cs = 'S3';
+          state.fsmDetectedCount++;
+        } else {
+          cs = 'S0';
+        }
+      } else if (cs === 'S3') {
+        cs = (bit === '0') ? 'S2' : 'S1';
+      }
+
+      state.fsmCurrentState = cs;
+      state.fsmIndex++;
+      renderModuleContent();
+    }
+
+    function resetFSM() {
+      state.fsmIndex = 0;
+      state.fsmCurrentState = 'S0';
+      state.fsmDetectedCount = 0;
+      renderModuleContent();
+    }
+
+    function getRAMSimHTML() {
+      const selectedAddr = state.ramAddress;
+      const inputData = state.ramInputData;
+      const cells = state.ramCells;
+
+      return `
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Controls Address & Data Input -->
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-4">
+              <div>
+                <label class="text-xs font-bold text-slate-400 block mb-1">Address Bus (2-bit / Alamat 0 - 3):</label>
+                <div class="flex gap-2">
+                  ${[0,1,2,3].map(addr => `
+                    <button onclick="setRAMAddr(${addr})" class="flex-1 py-1.5 rounded-lg text-xs font-bold font-mono border ${selectedAddr === addr ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-400 border-slate-800'}">
+                      0x0${addr}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div>
+                <label class="text-xs font-bold text-slate-400 block mb-1">Data Input Switches (4-bit Nibble):</label>
+                <div class="flex gap-2">
+                  ${inputData.map((b, idx) => `
+                    <button onclick="toggleRAMDataBit(${idx})" class="flex-1 py-1.5 rounded-lg font-mono text-xs font-bold border ${b ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-slate-900 text-slate-500 border-slate-800'}">
+                      ${b}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="flex gap-2 border-t border-slate-800 pt-3">
+                <button onclick="writeRAM()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow">
+                  <i class="fa-solid fa-pen-to-square"></i> Write Data (Penulisan)
+                </button>
+              </div>
+            </div>
+
+            <!-- RAM Memory Cells Matrix -->
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <span class="text-xs font-bold text-slate-400 uppercase block mb-3">Matriks Memori RAM 4x4 (16 Bits):</span>
+              <div class="space-y-2 font-mono text-xs">
+                ${cells.map((row, addr) => `
+                  <div class="flex items-center justify-between p-2 rounded-lg border ${selectedAddr === addr ? 'bg-blue-600/20 border-blue-500 font-bold' : 'bg-slate-900 border-slate-800'}">
+                    <span class="text-slate-400">Alamat [0x0${addr}]:</span>
+                    <span class="text-emerald-400 tracking-widest">${row.join('')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setRAMAddr(addr) {
+      state.ramAddress = addr;
+      renderModuleContent();
+    }
+
+    function toggleRAMDataBit(idx) {
+      state.ramInputData[idx] = state.ramInputData[idx] ? 0 : 1;
+      renderModuleContent();
+    }
+
+    function writeRAM() {
+      const addr = state.ramAddress;
+      state.ramCells[addr] = [...state.ramInputData];
+      renderModuleContent();
+    }
+
+    function getMicroarchSimHTML() {
+      const phase = state.cpuPhase; // 0: Fetch, 1: Decode, 2: Execute, 3: Store
+      const phaseNames = ["1. FETCH INSTRUCTION", "2. DECODE OPERAND", "3. EXECUTE ALU", "4. STORE RESULT"];
+
+      return `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase">Tahap Siklus Instruksi CPU:</span>
+            <button onclick="stepCPUPhase()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow">
+              Langkah Siklus Berikutnya
+            </button>
+          </div>
+
+          <!-- Architecture Components Layout -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div class="p-4 rounded-xl border ${phase === 0 ? 'bg-blue-600/20 border-blue-500 led-glow' : 'bg-slate-900 border-slate-800'}">
+              <span class="text-xs font-bold text-blue-400 block mb-1">CPU Registers (PC & IR)</span>
+              <p class="text-[10px] text-slate-400">Mengambil instruksi dari RAM</p>
+            </div>
+
+            <div class="p-4 rounded-xl border ${phase === 2 ? 'bg-amber-600/20 border-amber-500 led-glow-amber' : 'bg-slate-900 border-slate-800'}">
+              <span class="text-xs font-bold text-amber-400 block mb-1">ALU (Arithmetic Logic Unit)</span>
+              <p class="text-[10px] text-slate-400">Komputasi & Operasi Logika</p>
+            </div>
+
+            <div class="p-4 rounded-xl border ${phase === 3 ? 'bg-emerald-600/20 border-emerald-500 led-glow' : 'bg-slate-900 border-slate-800'}">
+              <span class="text-xs font-bold text-emerald-400 block mb-1">Memori Utama (RAM)</span>
+              <p class="text-[10px] text-slate-400">Penyimpanan Kode & Data</p>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center font-mono">
+            <span class="text-xs text-slate-400 uppercase block mb-1">Status Fase Saat Ini:</span>
+            <span class="text-lg font-bold text-blue-400">${phaseNames[phase]}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function stepCPUPhase() {
+      state.cpuPhase = (state.cpuPhase + 1) % 4;
+      renderModuleContent();
+    }
+
+    function getADCPWMSimHTML() {
+      const volt = state.adcVoltage; // 0..5.0
+      const adcVal = Math.round((volt / 5.0) * 255);
+      const adcBin = adcVal.toString(2).padStart(8, '0');
+
+      const pwm = state.pwmDuty; // 0..100
+
+      return `
+        <div class="space-y-6">
+          <!-- ADC Simulator -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider">1. Analog-to-Digital Converter (ADC 8-bit)</h4>
+            
+            <div class="flex items-center gap-4">
+              <input type="range" min="0" max="5.0" step="0.05" value="${volt}" oninput="updateADC(this.value)"
+                class="flex-1 accent-blue-500 h-2 bg-slate-900 rounded-lg cursor-pointer">
+              <span class="text-sm font-mono font-bold text-white w-16 text-right">${volt.toFixed(2)} V</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 font-bold block">Output Biner 8-bit</span>
+                <span class="text-sm font-mono font-bold text-emerald-400 tracking-widest">${adcBin}</span>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 font-bold block">Desimal (0-255)</span>
+                <span class="text-sm font-mono font-bold text-amber-400">${adcVal}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PWM Simulator -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">2. Pulse Width Modulation (PWM) LED Dimmer</h4>
+            
+            <div class="flex items-center gap-4">
+              <input type="range" min="0" max="100" value="${pwm}" oninput="updatePWM(this.value)"
+                class="flex-1 accent-amber-500 h-2 bg-slate-900 rounded-lg cursor-pointer">
+              <span class="text-sm font-mono font-bold text-white w-16 text-right">${pwm}%</span>
+            </div>
+
+            <div class="flex items-center justify-around bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <span class="text-xs font-bold text-slate-400">Simulasi Kecerahan LED PWM:</span>
+              <div class="w-12 h-12 rounded-full border border-amber-400 transition-all duration-150"
+                style="background-color: rgba(245, 158, 11, ${pwm/100}); box-shadow: 0 0 ${pwm/3}px rgba(245, 158, 11, 0.8);">
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateADC(v) {
+      state.adcVoltage = parseFloat(v);
+      renderModuleContent();
+    }
+
+    function updatePWM(p) {
+      state.pwmDuty = parseInt(p);
+      renderModuleContent();
+    }
+
+    function getHDLSimHTML() {
+      return `
+        <div class="space-y-5">
+          <div>
+            <label class="text-xs font-bold text-slate-400 uppercase block mb-2">Verilog Hardware Code Editor:</label>
+            <textarea id="verilogCode" class="w-full h-40 bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-emerald-400 focus:outline-none leading-relaxed">${state.hdlCode}</textarea>
+          </div>
+
+          <button onclick="simulateHDL()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow flex items-center gap-2">
+            <i class="fa-solid fa-play"></i> Sintesis & Jalankan Simulasi Logic Waveform
+          </button>
+
+          ${state.hdlSimulated ? `
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 font-mono text-xs">
+              <span class="text-xs font-bold text-amber-400 block mb-1">Hasil Output Simulasi Pewaktuan (Timing Diagram):</span>
+              <div class="text-slate-300">CLK:  _|-|_|-|_|-|_|-|_</div>
+              <div class="text-emerald-400">A  :  ___|-------|____</div>
+              <div class="text-emerald-400">B  :  _____|---|______</div>
+              <div class="text-blue-400 font-bold">Y  :  _____|---|______ (A & B Output OK)</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function simulateHDL() {
+      const code = document.getElementById('verilogCode').value;
+      state.hdlCode = code;
+      state.hdlSimulated = true;
+      renderModuleContent();
+    }
+
+    function getProyekUASSimHTML() {
+      const uasSubmitted = state.uasSubmitted;
+      const questions = [
+        {
+          q: "1. Struktur FSM manakah yang nilai output-nya hanya bergantung pada Current State?",
+          opts: ["A. Mealy Machine", "B. Moore Machine", "C. Register Machine", "D. Combinational Logic"],
+          ans: 1, // B
+          exp: "Moore Machine memiliki output yang hanya ditentukan oleh State saat ini."
+        },
+        {
+          q: "2. Pada arsitektur mikroprosessor, fungsi utama Bus Alamat (Address Bus) adalah:",
+          opts: ["A. Mentransfer data biner", "B. Menentukan lokasi alamat memori yang diakses", "C. Mengirim sinyal clock", "D. Mengontrol interrupt"],
+          ans: 1, // B
+          exp: "Address Bus membawa informasi alamat memori dari CPU ke perangkat luar/RAM."
+        }
+      ];
+
+      return `
+        <div class="space-y-6">
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3">Integrasi Proyek: Simulator Lampu Lalu Lintas Digital</h4>
+            <div class="flex items-center justify-around bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <div class="flex flex-col gap-2 items-center">
+                <div class="w-8 h-8 rounded-full border border-slate-700 bg-rose-600 led-glow-red"></div>
+                <div class="w-8 h-8 rounded-full border border-slate-700 bg-slate-950"></div>
+                <div class="w-8 h-8 rounded-full border border-slate-700 bg-slate-950"></div>
+              </div>
+              <span class="text-xs text-slate-300 font-mono">Fasa Merah: 5s (Stop)</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Evaluasi Akhir Perkuliahan (UAS Kuis)</h4>
+            ${questions.map((item, qIdx) => `
+              <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                <p class="text-xs font-bold text-white">${item.q}</p>
+                <div class="grid grid-cols-2 gap-2">
+                  ${item.opts.map((opt, oIdx) => `
+                    <button onclick="selectUASAns(${qIdx}, ${oIdx})" ${uasSubmitted ? 'disabled' : ''} 
+                      class="p-2 rounded text-xs text-left border ${state.uasAnswers[qIdx] === oIdx ? 'bg-blue-600 text-white' : 'bg-slate-950 text-slate-400 border-slate-800'}">
+                      ${opt}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+
+            ${!uasSubmitted ? `
+              <button onclick="submitUAS()" class="px-5 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow">
+                Kirim Lembar UAS
+              </button>
+            ` : `
+              <p class="text-xs text-emerald-400 font-bold font-mono">Nilai UAS Berhasil Disimpan!</p>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectUASAns(qIdx, oIdx) {
+      state.uasAnswers[qIdx] = oIdx;
+      renderModuleContent();
+    }
+
+    function submitUAS() {
+      state.uasSubmitted = true;
+      renderModuleContent();
+    }
+
+    function attachSimulatorEventListeners() {
+      // Helper event attachments
+    }
+
+    // App Initialization
+    window.onload = () => {
+      renderTabs();
+      renderModuleContent();
+    };
+  </script>
+</body>
+</html>
+```
+
+### Summary of Changes:
+* Added the missing `$` character before `{[0,1,2,3].map(...)}` in `getRAMSimHTML()` so the array mapping evaluates correctly inside the template literal.
