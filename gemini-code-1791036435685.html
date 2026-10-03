@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Digital • Media Ajar Interaktif</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-card: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #475569;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .header-title h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .badge {
+      background: rgba(37, 99, 235, 0.2);
+      border: 1px solid var(--primary);
+      color: #60a5fa;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Main Content */
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Navigasi Minggu (Grid Modul) */
+    .weeks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .week-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.85rem 0.5rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .week-btn:hover {
+      background: var(--surface-card);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .week-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Container Detail Modul */
+    .module-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .module-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .module-header h2 {
+      font-size: 1.5rem;
+      color: #38bdf8;
+    }
+
+    .module-header span {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .module-content p {
+      color: #cbd5e1;
+      margin-bottom: 1.25rem;
+      font-size: 1rem;
+    }
+
+    .module-content ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #cbd5e1;
+    }
+
+    .module-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Area Simulator Interaktif */
+    .simulator-box {
+      background: #090d16;
+      border: 1px dashed var(--primary);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .simulator-box h3 {
+      font-size: 1.1rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Logic Gate Simulator Styling */
+    .sim-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .sim-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .sim-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .toggle-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      background: var(--surface);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      user-select: none;
+    }
+
+    .toggle-switch.on {
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .output-indicator {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #475569;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+      transition: all 0.3s ease;
+    }
+
+    .output-indicator.active {
+      background: #10b981;
+      box-shadow: 0 0 15px #10b981;
+    }
+
+    /* Converter Styling */
+    .converter-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .result-card {
+      background: var(--surface);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .result-card label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .result-card span {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    /* Table Truth Table */
+    table.truth-table {
+      width: 100%;
+      max-width: 400px;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    table.truth-table th, table.truth-table td {
+      border: 1px solid var(--border);
+      padding: 0.5rem;
+      text-align: center;
+    }
+
+    table.truth-table th {
+      background: var(--surface-card);
+    }
+
+    table.truth-table tr.highlight {
+      background: rgba(37, 99, 235, 0.3);
+      font-weight: bold;
+    }
+
+    /* Footer */
+    footer {
+      background: #090d16;
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      margin-top: 3rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .footer-references strong {
+      color: var(--text);
+    }
+
+    .footer-references ol {
+      margin-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .footer-references li {
+      margin-bottom: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="header-title">
+        <h1>⚡ Sistem Digital • Media Ajar Interaktif</h1>
+        <p>Mata Kuliah: Sistem Digital (3 SKS) | Institut Teknologi Sumatera (ITERA)</p>
+      </div>
+      <div>
+        <span class="badge">🚀 Semester Penuh (Minggu 1 - 14)</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-title">
+        📅 Navigasi Modul Perkuliahan (Minggu 1 s.d. 14)
+      </div>
+      <div class="section-subtitle">
+        Klik minggu perkuliahan di bawah untuk membuka materi & simulator interaktif:
+      </div>
+
+      <div class="weeks-grid" id="weeksGrid">
+        <!-- Generasi Tombol Minggu 1-14 oleh JavaScript -->
+      </div>
+    </section>
+
+    <!-- Kontainer Detail Modul & Simulator -->
+    <section class="module-card" id="moduleContainer">
+      <!-- Diisi secara dinamis oleh JavaScript -->
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-references">
+        <strong>Referensi Buku Ajar:</strong>
+        <ol>
+          <li>Frank Vahid & Tony Givargis – <em>Embedded System Design: A Unified Hardware/Software Introduction</em> (Wiley)</li>
+          <li>Raj Kamal – <em>Embedded Systems: Architecture, Programming and Design</em> (McGraw-Hill)</li>
+          <li>Peter Barry & Patrick Crowley – <em>Modern Embedded Computing</em> (Morgan Kaufmann)</li>
+        </ol>
+      </div>
+      <div>
+        <p><strong>Media Pembelajaran Interaktif HTML5 MK Sistem Digital</strong></p>
+        <p>Dibuat untuk kebutuhan perkuliahan interaktif & praktikum digital secara mandiri.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #64748b;">© Institut Teknologi Sumatera (ITERA)</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Data Modul Minggu 1 - 14
+    const modules = {
+      1: {
+        title: "Pengantar Sistem Digital & Sistem Bilangan",
+        desc: "Memahami perbedaan sistem analog dan digital, serta konversi sistem bilangan (Biner, Desimal, Oktal, Hexadesimal).",
+        points: [
+          "Sinyal Kontinu (Analog) vs Sinyal Diskrit (Digital)",
+          "Representasi Bilangan Biner (Base-2), Desimal (Base-10), dan Hexadesimal (Base-16)",
+          "Konversi antar-sistem bilangan dan operasi aritmatika biner dasar"
+        ],
+        type: "converter"
+      },
+      2: {
+        title: "Gerbang Logika Dasar & Tabel Kebenaran",
+        desc: "Pelajari prinsip kerja gerbang logika AND, OR, NOT, NAND, NOR, XOR, dan XNOR.",
+        points: [
+          "Gerbang Logika Dasar: AND, OR, NOT",
+          "Gerbang Logika Universal: NAND, NOR",
+          "Gerbang Eksklusif: XOR dan XNOR",
+          "Penyusunan dan analisis Tabel Kebenaran (Truth Table)"
+        ],
+        type: "logic_gates"
+      },
+      3: {
+        title: "Aljabar Boolean & Penyederhanaan Logika",
+        desc: "Hukum aljabar Boolean dan penggunaan Peta Karnaugh (K-Map) untuk penyederhanaan fungsi logika.",
+        points: [
+          "Hukum & Teorema De Morgan",
+          "Bentuk Standar: Sum of Products (SOP) dan Product of Sums (POS)",
+          "Minimisasi fungsi logika menggunakan K-Map (2, 3, dan 4 variabel)"
+        ],
+        type: "text_only"
+      },
+      4: {
+        title: "Rangkaian Kombinasional Aritmatika",
+        desc: "Perancangan rangkaian penambah dan pengurang biner.",
+        points: [
+          "Half Adder dan Full Adder",
+          "Half Subtractor dan Full Subtractor",
+          "Parallel Binary Adder & Carry Lookahead Adder"
+        ],
+        type: "text_only"
+      },
+      5: {
+        title: "Multiplexer, Demultiplexer, Decoder & Encoder",
+        desc: "Rangkaian seleksi data dan konversi kode dalam sistem digital.",
+        points: [
+          "Decoder (misal: 2-to-4, 3-to-8, BCD to 7-Segment)",
+          "Priority Encoder",
+          "Multiplexer (MUX) sebagai pemilih jalur data",
+          "Demultiplexer (DEMUX)"
+        ],
+        type: "text_only"
+      },
+      6: {
+        title: "Elemen Memori: Latch & Flip-Flop",
+        desc: "Rangkaian sekuensial dasar penyimpan 1-bit data.",
+        points: [
+          "Perbedaan Rangkaian Kombinasional vs Sekuensial",
+          "SR Latch & Clocked SR Flip-Flop",
+          "JK Flip-Flop, D Flip-Flop, dan T Flip-Flop",
+          "Triggering: Edge-Triggered vs Level-Sensitive"
+        ],
+        type: "text_only"
+      },
+      7: {
+        title: "Register & Counter (Pencacah)",
+        desc: "Penyimpanan data multi-bit dan pencacah pulsa clock.",
+        points: [
+          "Shift Register (SISO, SIPO, PISO, PIPO)",
+          "Asynchronous (Ripple) Counter",
+          "Synchronous Counter & Up/Down Counter",
+          "Aplikasi pencacah pada pewaktu (Timer)"
+        ],
+        type: "text_only"
+      },
+      8: {
+        title: "Evaluasi Tengah Semester (UTS)",
+        desc: "Ujian evaluasi capaian pembelajaran modul 1 hingga 7.",
+        points: [
+          "Review Konversi Bilangan & Aljabar Boolean",
+          "Perancangan Rangkaian Kombinasional",
+          "Analisis Rangkaian Sekuensial Dasar"
+        ],
+        type: "text_only"
+      },
+      9: {
+        title: "Finite State Machine (FSM)",
+        desc: "Model matematika untuk perancangan sistem sekuensial terstruktur.",
+        points: [
+          "Model Mealy Machine vs Moore Machine",
+          "Diagram Transisi Keadaan (State Diagram) & Tabel Keadaan",
+          "State Assignment dan Sintesis Rangkaian FSM"
+        ],
+        type: "text_only"
+      },
+      10: {
+        title: "Memori Digital (RAM & ROM)",
+        desc: "Arsitektur dan jenis-jenis memori semikonduktor.",
+        points: [
+          "Random Access Memory (SRAM vs DRAM)",
+          "Read Only Memory (ROM, PROM, EPROM, EEPROM, Flash)",
+          "Organisasi Memori dan Dekoding Alamat (Address Decoding)"
+        ],
+        type: "text_only"
+      },
+      11: {
+        title: "Pengantar Mikroarsitektur & Bus System",
+        desc: "Interkoneksi antar komponen utama dalam komputer/mikrokontroler.",
+        points: [
+          "Arsitektur Von Neumann vs Harvard",
+          "Data Bus, Address Bus, dan Control Bus",
+          "ALU (Arithmetic Logic Unit) dan Register File"
+        ],
+        type: "text_only"
+      },
+      12: {
+        title: "Interfacing & Digital I/O",
+        desc: "Teknik antarmuka sistem digital dengan dunia luar.",
+        points: [
+          "General Purpose Input/Output (GPIO)",
+          "Analog-to-Digital Converter (ADC) & Digital-to-Analog Converter (DAC)",
+          "Protokol Komunikasi Serial (UART, SPI, I2C)"
+        ],
+        type: "text_only"
+      },
+      13: {
+        title: "Perancangan Rangkaian Digital & Hardware Description Language (HDL)",
+        desc: "Pengenalan pemodelan perangkat keras menggunakan VHDL/Verilog.",
+        points: [
+          "Konsep Dasar Design Entry dengan HDL",
+          "Simulasi dan Sintesis Logic",
+          "Pengenalan Target Hardware FPGA & CPLD"
+        ],
+        type: "text_only"
+      },
+      14: {
+        title: "Evaluasi Akhir & Presentasi Proyek Sistem Digital",
+        desc: "Integrasi seluruh materi dalam bentuk proyek aplikasi nyata.",
+        points: [
+          "Implementasi Rangkaian Kompleks (FSM + Counter + Display)",
+          "Pengujian dan Troubleshooting Rangkaian Digital",
+          "Evaluasi Akhir Perkuliahan (UAS)"
+        ],
+        type: "text_only"
+      }
+    };
+
+    let activeWeek = 1;
+    let gateA = 0;
+    let gateB = 0;
+    let selectedGate = 'AND';
+
+    // Inisialisasi Tombol Minggu
+    function initWeeksGrid() {
+      const grid = document.getElementById('weeksGrid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 14; i++) {
+        const btn = document.createElement('button');
+        btn.className = `week-btn ${i === activeWeek ? 'active' : ''}`;
+        btn.innerText = `Minggu ${i}`;
+        btn.onclick = () => selectWeek(i);
+        grid.appendChild(btn);
+      }
+    }
+
+    // Pilih Minggu
+    function selectWeek(weekNum) {
+      activeWeek = weekNum;
+      initWeeksGrid();
+      renderModule();
+    }
+
+    // Render Konten Modul
+    function renderModule() {
+      const data = modules[activeWeek];
+      const container = document.getElementById('moduleContainer');
+
+      let pointsHTML = data.points.map(p => `<li>${p}</li>`).join('');
+      let simHTML = '';
+
+      if (data.type === 'converter') {
+        simHTML = `
+          <div class="simulator-box">
+            <h3>🔢 Simulator Interaktif: Konverter Bilangan Biner</h3>
+            <p style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 1rem;">Masukkan angka biner di bawah ini (contoh: 101101):</p>
+            <input type="text" id="binInput" class="converter-input" value="1010" oninput="convertBinary(this.value)" placeholder="Ketik biner 0 dan 1...">
+            <div class="result-grid">
+              <div class="result-card">
+                <label>Desimal (Base-10)</label>
+                <span id="resDec">10</span>
+              </div>
+              <div class="result-card">
+                <label>Hexadesimal (Base-16)</label>
+                <span id="resHex">A</span>
+              </div>
+              <div class="result-card">
+                <label>Oktal (Base-8)</label>
+                <span id="resOct">12</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (data.type === 'logic_gates') {
+        simHTML = `
+          <div class="simulator-box">
+            <h3>🔀 Simulator Interaktif: Gerbang Logika</h3>
+            
+            <div style="margin-bottom: 1rem;">
+              <label style="font-size:0.875rem; color:#94a3b8; display:block; margin-bottom:0.5rem;">Pilih Gerbang Logika:</label>
+              <div class="sim-controls">
+                ${['AND', 'OR', 'NAND', 'NOR', 'XOR', 'XNOR'].map(g => 
+                  `<button class="sim-btn ${selectedGate === g ? 'active' : ''}" onclick="setGate('${g}')">${g}</button>`
+                ).join('')}
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+              <div class="toggle-switch ${gateA ? 'on' : ''}" onclick="toggleInput('A')">
+                Input A: <strong>${gateA}</strong>
+              </div>
+              <div class="toggle-switch ${gateB ? 'on' : ''}" onclick="toggleInput('B')">
+                Input B: <strong>${gateB}</strong>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; background: #1e293b; padding: 0.5rem 1rem; border-radius: 0.5rem;">
+                Output: <span id="gateOutputVal">0</span>
+                <span class="output-indicator" id="gateOutputBulb"></span>
+              </div>
+            </div>
+
+            <h4>Tabel Kebenaran ${selectedGate}:</h4>
+            <table class="truth-table" id="truthTable">
+              <!-- Render otomatis -->
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="module-header">
+          <span>Modul Minggu ${activeWeek}</span>
+          <h2>${data.title}</h2>
+        </div>
+        <div class="module-content">
+          <p>${data.desc}</p>
+          <strong style="color: #f8fafc; display: block; margin-bottom: 0.5rem;">Pokok Bahasan Utama:</strong>
+          <ul>
+            ${pointsHTML}
+          </ul>
+          ${simHTML}
+        </div>
+      `;
+
+      if (data.type === 'logic_gates') {
+        updateGateSim();
+      }
+    }
+
+    // Converter Logic
+    function convertBinary(val) {
+      val = val.replace(/[^01]/g, '');
+      document.getElementById('binInput').value = val;
+      
+      if (!val) {
+        document.getElementById('resDec').innerText = '0';
+        document.getElementById('resHex').innerText = '0';
+        document.getElementById('resOct').innerText = '0';
+        return;
+      }
+
+      const dec = parseInt(val, 2);
+      document.getElementById('resDec').innerText = dec.toString(10);
+      document.getElementById('resHex').innerText = dec.toString(16).toUpperCase();
+      document.getElementById('resOct').innerText = dec.toString(8);
+    }
+
+    // Logic Gate Simulator
+    function setGate(gate) {
+      selectedGate = gate;
+      renderModule();
+    }
+
+    function toggleInput(input) {
+      if (input === 'A') gateA = gateA === 0 ? 1 : 0;
+      if (input === 'B') gateB = gateB === 0 ? 1 : 0;
+      renderModule();
+    }
+
+    function calculateGateOutput(g, a, b) {
+      switch(g) {
+        case 'AND': return a && b;
+        case 'OR': return a || b;
+        case 'NAND': return !(a && b) ? 1 : 0;
+        case 'NOR': return !(a || b) ? 1 : 0;
+        case 'XOR': return a ^ b;
+        case 'XNOR': return (a ^ b) === 0 ? 1 : 0;
+        default: return 0;
+      }
+    }
+
+    function updateGateSim() {
+      const out = calculateGateOutput(selectedGate, gateA, gateB);
+      const outVal = document.getElementById('gateOutputVal');
+      const bulb = document.getElementById('gateOutputBulb');
+
+      if (outVal && bulb) {
+        outVal.innerText = out;
+        if (out) {
+          bulb.classList.add('active');
+        } else {
+          bulb.classList.remove('active');
+        }
+      }
+
+      // Render Truth Table
+      const table = document.getElementById('truthTable');
+      if (!table) return;
+
+      let html = `
+        <tr>
+          <th>Input A</th>
+          <th>Input B</th>
+          <th>Output (${selectedGate})</th>
+        </tr>
+      `;
+
+      const combinations = [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1]
+      ];
+
+      combinations.forEach(([a, b]) => {
+        const res = calculateGateOutput(selectedGate, a, b);
+        const isCurrent = (a === gateA && b === gateB);
+        html += `
+          <tr class="${isCurrent ? 'highlight' : ''}">
+            <td>${a}</td>
+            <td>${b}</td>
+            <td>${res}</td>
+          </tr>
+        `;
+      });
+
+      table.innerHTML = html;
+    }
+
+    // Inisialisasi awal saat load
+    window.onload = () => {
+      initWeeksGrid();
+      renderModule();
+    };
+  </script>
+</body>
+</html>
